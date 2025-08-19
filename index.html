@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SoleFresh - Каталог услуг</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Подключение иконок -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -44,7 +43,10 @@
             </button>
         </div>
         
-        <div id="cart" onclick="viewCart()">0</div>
+        <div id="cart" onclick="viewCart()">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="cart-count">0</span>
+        </div>
     </div>
 
     <script>
@@ -57,7 +59,7 @@
         }
         
         function updateCartCount() {
-            document.getElementById('cart').innerText = cart.length;
+            document.getElementById('cart-count').innerText = cart.length;
         }
         
         function showNotification(message) {
@@ -71,13 +73,24 @@
             
             setTimeout(() => {
                 notification.classList.add('show');
+                
                 setTimeout(() => {
-                    notification.remove();
+                    notification.classList.remove('show');
+                    notification.classList.add('hide');
+                    
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
                 }, 2000);
             }, 100);
         }
         
         function viewCart() {
+            if (cart.length === 0) {
+                showNotification('Корзина пуста!');
+                return;
+            }
+            
             let message = "🛒 Ваш заказ:\n\n";
             let total = 0;
             
@@ -88,10 +101,15 @@
             
             message += `\n💵 Итого: ${total} руб`;
             
-            Telegram.WebApp.sendData(JSON.stringify({
-                cart: cart,
-                total: total
-            }));
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.sendData(JSON.stringify({
+                    cart: cart,
+                    total: total
+                }));
+            } else {
+                alert(message);
+                console.log("Данные корзины:", {cart, total});
+            }
         }
     </script>
 </body>
