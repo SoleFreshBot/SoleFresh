@@ -3,92 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Каталог услуг</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 10px;
-            background: #f5f5f5;
-        }
-        .service {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        button {
-            background: #0088cc;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        #cart {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: #0088cc;
-            color: white;
-            padding: 10px;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            text-align: center;
-            line-height: 40px;
-        }
-    </style>
+    <title>SoleFresh - Каталог услуг</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Подключение иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <h2>Выберите услуги</h2>
-
-    <div class="service">
-        <h3>🚀 Услуга 1</h3>
-        <p>Описание услуги 1</p>
-        <button onclick="addToCart('Услуга 1', 1000)">Добавить (1000 руб)</button>
+    <div class="container">
+        <h2><i class="fas fa-list-alt"></i> Каталог услуг</h2>
+        
+        <div class="service">
+            <h3><i class="fas fa-rocket"></i> Премиум дизайн</h3>
+            <p>Эксклюзивный дизайн для вашего проекта с 3D-визуализацией</p>
+            <button onclick="addToCart('Премиум дизайн', 5000)">
+                <i class="fas fa-cart-plus"></i> Добавить (5000 руб)
+            </button>
+        </div>
+        
+        <div class="service">
+            <h3><i class="fas fa-chart-line"></i> Продвижение</h3>
+            <p>Комплексное продвижение в социальных сетях</p>
+            <button onclick="addToCart('Продвижение', 3000)">
+                <i class="fas fa-cart-plus"></i> Добавить (3000 руб)
+            </button>
+        </div>
+        
+        <div class="service">
+            <h3><i class="fas fa-code"></i> Разработка</h3>
+            <p>Создание сайтов и веб-приложений под ключ</p>
+            <button onclick="addToCart('Разработка', 10000)">
+                <i class="fas fa-cart-plus"></i> Добавить (10000 руб)
+            </button>
+        </div>
+        
+        <div class="service">
+            <h3><i class="fas fa-headset"></i> Консультация</h3>
+            <p>Индивидуальная консультация по digital-стратегии</p>
+            <button onclick="addToCart('Консультация', 2500)">
+                <i class="fas fa-cart-plus"></i> Добавить (2500 руб)
+            </button>
+        </div>
+        
+        <div id="cart" onclick="viewCart()">0</div>
     </div>
-
-    <div class="service">
-        <h3>🎨 Услуга 2</h3>
-        <p>Описание услуги 2</p>
-        <button onclick="addToCart('Услуга 2', 1500)">Добавить (1500 руб)</button>
-    </div>
-
-    <div class="service">
-        <h3>📊 Услуга 3</h3>
-        <p>Описание услуги 3</p>
-        <button onclick="addToCart('Услуга 3', 2000)">Добавить (2000 руб)</button>
-    </div>
-
-    <div class="service">
-        <h3>🔧 Услуга 4</h3>
-        <p>Описание услуги 4</p>
-        <button onclick="addToCart('Услуга 4', 2500)">Добавить (2500 руб)</button>
-    </div>
-
-    <div id="cart" onclick="viewCart()">0</div>
 
     <script>
         let cart = [];
-
+        
         function addToCart(name, price) {
             cart.push({name, price});
+            updateCartCount();
+            showNotification(`${name} добавлен в корзину!`);
+        }
+        
+        function updateCartCount() {
             document.getElementById('cart').innerText = cart.length;
         }
-
+        
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <span>${message}</span>
+                <i class="fas fa-check"></i>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 2000);
+            }, 100);
+        }
+        
         function viewCart() {
-            let message = "🛒 Ваш заказ:\n";
+            let message = "🛒 Ваш заказ:\n\n";
             let total = 0;
-
+            
             cart.forEach(item => {
-                message += `- ${item.name}: ${item.price} руб\n`;
+                message += `▪️ ${item.name}: ${item.price} руб\n`;
                 total += item.price;
             });
-
-            message += `\nИтого: ${total} руб`;
-
-            // Отправляем данные в Telegram
+            
+            message += `\n💵 Итого: ${total} руб`;
+            
             Telegram.WebApp.sendData(JSON.stringify({
                 cart: cart,
                 total: total
