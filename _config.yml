@@ -1,2 +1,14 @@
+title: SoleFresh Каталог
+theme: jekyll-theme-cayman
+description: "Выберите услуги и добавьте в корзину"
+plugins:
+  - jekyll-remote-theme
+
+# Настройки для корректного отображения WebApp
+markdown: kramdown
+permalink: pretty
+include: [".html", ".css", ".js"]
+exclude: ["README.md"]
+
+# Дополнительные настройки
 remote_theme: pages-themes/cayman@v0.2.0
-include: [".html"]
