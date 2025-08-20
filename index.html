@@ -117,6 +117,10 @@
             width: 100%;
         }
         
+        .hidden {
+            display: none !important;
+        }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -124,7 +128,7 @@
     </style>
 </head>
 <body>
-    <div id="registration-modal" style="display: none;">
+    <div id="registration-modal" class="hidden">
         <div class="registration-form">
             <h2 style="text-align: center; margin-bottom: 20px;">📝 Регистрация</h2>
             <div class="form-group">
@@ -146,11 +150,11 @@
     <div class="container">
         <h2><i class="fas fa-list-alt"></i> Каталог услуг</h2>
         
-        <div id="user-info" style="display: none;"></div>
+        <div id="user-info" class="hidden"></div>
         
         <div id="loader" class="loader"></div>
         
-        <div id="services" style="display: none;">
+        <div id="services" class="hidden">
             <div class="service">
                 <h3><i class="fas fa-rocket"></i> Премиум дизайн</h3>
                 <p>Эксклюзивный дизайн для вашего проекта с 3D-визуализацией</p>
@@ -184,7 +188,7 @@
             </div>
         </div>
         
-        <div id="cart" onclick="viewCart()" style="display: none;">
+        <div id="cart" onclick="viewCart()" class="hidden">
             <i class="fas fa-shopping-cart"></i>
             <span id="cart-count">0</span>
         </div>
@@ -194,6 +198,16 @@
         let cart = [];
         let user_id = null;
         const API_BASE_URL = 'http://localhost:8000';
+
+        // Показать элемент
+        function showElement(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        // Скрыть элемент
+        function hideElement(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
 
         // Инициализация WebApp
         document.addEventListener('DOMContentLoaded', async () => {
@@ -206,6 +220,10 @@
                 } else {
                     showNotification('Ошибка авторизации', 'error');
                 }
+            } else {
+                // Для тестирования вне Telegram
+                user_id = 12345;
+                showElement('registration-modal');
             }
         });
 
@@ -220,16 +238,18 @@
                 if (userData.exists) {
                     // Пользователь зарегистрирован
                     showUserInfo(userData);
-                    document.getElementById('services').style.display = 'block';
-                    document.getElementById('cart').style.display = 'flex';
+                    showElement('services');
+                    showElement('cart');
                     await loadCart();
                 } else {
                     // Показываем форму регистрации
-                    document.getElementById('registration-modal').style.display = 'flex';
+                    showElement('registration-modal');
                 }
             } catch (e) {
                 console.error('Auth error:', e);
-                showNotification('Ошибка подключения', 'error');
+                showNotification('Ошибка подключения к серверу', 'error');
+                // Показываем регистрацию при ошибке
+                showElement('registration-modal');
             } finally {
                 hideLoader();
             }
@@ -241,13 +261,18 @@
             const lastName = document.getElementById('lastName').value.trim();
             const phone = document.getElementById('phone').value.trim();
             
-            if (!firstName || !lastName || !phone) {
-                showNotification('Заполните все поля', 'error');
+            if (!firstName || firstName.length < 2) {
+                showNotification('Имя должно содержать минимум 2 символа', 'error');
                 return;
             }
             
-            if (!phone.match(/^\+?[1-9]\d{1,14}$/)) {
-                showNotification('Неверный формат телефона', 'error');
+            if (!lastName || lastName.length < 2) {
+                showNotification('Фамилия должна содержать минимум 2 символа', 'error');
+                return;
+            }
+            
+            if (!phone || !phone.match(/^\+?[1-9]\d{1,14}$/)) {
+                showNotification('Введите корректный номер телефона', 'error');
                 return;
             }
             
@@ -270,7 +295,7 @@
                 const result = await response.json();
                 
                 if (result.status === 'success') {
-                    document.getElementById('registration-modal').style.display = 'none';
+                    hideElement('registration-modal');
                     showNotification('Регистрация успешна!', 'success');
                     
                     // Показываем информацию о пользователе
@@ -281,8 +306,8 @@
                     });
                     
                     // Показываем каталог и корзину
-                    document.getElementById('services').style.display = 'block';
-                    document.getElementById('cart').style.display = 'flex';
+                    showElement('services');
+                    showElement('cart');
                     
                     // Отправляем данные в бота
                     if (window.Telegram && Telegram.WebApp) {
@@ -296,11 +321,11 @@
                         }));
                     }
                 } else {
-                    showNotification('Ошибка регистрации', 'error');
+                    showNotification('Ошибка регистрации: ' + result.detail, 'error');
                 }
             } catch (e) {
                 console.error('Registration error:', e);
-                showNotification('Ошибка регистрации', 'error');
+                showNotification('Ошибка подключения к серверу', 'error');
             } finally {
                 hideLoader();
             }
@@ -319,11 +344,141 @@
                     </div>
                 </div>
             `;
-            document.getElementById('user-info').style.display = 'block';
+            showElement('user-info');
         }
 
-        // Остальные функции остаются без изменений (loadCart, saveCart, addToCart, viewCart, etc.)
-        // ... [остальной код функций loadCart, saveCart, addToCart, viewCart и т.д.]
+        // Загрузка корзины из БД
+        async function loadCart() {
+            if (!user_id) return;
+            
+            showLoader();
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/get_cart?user_id=${user_id}`);
+                const data = await response.json();
+                
+                if (data.cart_data) {
+                    cart = JSON.parse(data.cart_data);
+                    updateCartCount();
+                }
+            } catch (e) {
+                console.error("Ошибка загрузки корзины:", e);
+            } finally {
+                hideLoader();
+            }
+        }
+
+        // Сохранение корзины в БД
+        async function saveCart() {
+            if (!user_id) return;
+            
+            showLoader();
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/save_cart`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: user_id,
+                        cart_data: JSON.stringify(cart)
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.status !== 'success') {
+                    throw new Error('Ошибка сохранения');
+                }
+                return true;
+            } catch (e) {
+                console.error("Ошибка сохранения корзины:", e);
+                showNotification('Ошибка сохранения корзины', 'error');
+                return false;
+            } finally {
+                hideLoader();
+            }
+        }
+
+        // Добавление в корзину
+        async function addToCart(name, price) {
+            cart.push({name, price});
+            updateCartCount();
+            showNotification(`${name} добавлен в корзину!`);
+            await saveCart();
+        }
+
+        // Просмотр корзины
+        async function viewCart() {
+            if (cart.length === 0) {
+                showNotification('Корзина пуста!', 'warning');
+                return;
+            }
+            
+            let message = "🛒 Ваш заказ:\n\n";
+            let total = 0;
+            
+            cart.forEach(item => {
+                message += `▪️ ${item.name}: ${item.price} руб\n`;
+                total += item.price;
+            });
+            
+            message += `\n💵 Итого: ${total} руб`;
+            
+            if (window.Telegram && Telegram.WebApp) {
+                try {
+                    await saveCart();
+                    Telegram.WebApp.sendData(JSON.stringify({
+                        action: 'view_cart',
+                        cart: cart,
+                        total: total
+                    }));
+                } catch (e) {
+                    showNotification('Ошибка отправки данных', 'error');
+                }
+            } else {
+                alert(message);
+            }
+        }
+
+        // Обновление счетчика корзины
+        function updateCartCount() {
+            document.getElementById('cart-count').innerText = cart.length;
+        }
+
+        // Показать уведомление
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <span>${message}</span>
+                <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'exclamation'}"></i>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    notification.classList.add('hide');
+                    
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 2000);
+            }, 100);
+        }
+
+        // Показать загрузчик
+        function showLoader() {
+            document.getElementById('loader').style.display = 'block';
+        }
+
+        // Скрыть загрузчик
+        function hideLoader() {
+            document.getElementById('loader').style.display = 'none';
+        }
     </script>
 </body>
 </html>
