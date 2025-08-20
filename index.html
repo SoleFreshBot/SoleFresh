@@ -17,6 +17,52 @@
             margin: 20px auto;
             display: none;
         }
+        
+        .notification {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification.error {
+            background: #f44336;
+        }
+        
+        .notification.warning {
+            background: #ff9800;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .notification.hide {
+            transform: translateY(-100px);
+            opacity: 0;
+        }
+        
+        #user-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0088cc;
+            display: none;
+        }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -26,6 +72,8 @@
 <body>
     <div class="container">
         <h2><i class="fas fa-list-alt"></i> Каталог услуг</h2>
+        
+        <div id="user-info"></div>
         
         <div id="loader" class="loader"></div>
         
@@ -72,6 +120,7 @@
     <script>
         let cart = [];
         let user_id = null;
+        const API_BASE_URL = 'https://your-api-domain.com'; // ЗАМЕНИТЕ НА ВАШ URL API
 
         // Инициализация WebApp
         document.addEventListener('DOMContentLoaded', async () => {
@@ -79,6 +128,7 @@
                 Telegram.WebApp.expand();
                 user_id = Telegram.WebApp.initDataUnsafe.user?.id;
                 await loadCart();
+                await checkAuth();
             }
         });
 
@@ -89,17 +139,15 @@
             showLoader();
             
             try {
-                const response = await fetch(`https://your-api-domain.com/get_cart?user_id=${user_id}`);
+                const response = await fetch(`${API_BASE_URL}/get_cart?user_id=${user_id}`);
                 const data = await response.json();
                 
                 if (data.cart_data) {
                     cart = JSON.parse(data.cart_data);
                     updateCartCount();
-                    showNotification('Корзина загружена');
                 }
             } catch (e) {
                 console.error("Ошибка загрузки корзины:", e);
-                showNotification('Ошибка загрузки корзины', 'error');
             } finally {
                 hideLoader();
             }
@@ -112,7 +160,7 @@
             showLoader();
             
             try {
-                const response = await fetch('https://your-api-domain.com/save_cart', {
+                const response = await fetch(`${API_BASE_URL}/save_cart`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -137,8 +185,48 @@
             }
         }
 
+        // Проверка авторизации
+        async function checkAuth() {
+            if (!user_id) {
+                showNotification('Для работы с корзиной需要 авторизация', 'error');
+                return false;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/get_user/${user_id}`);
+                const userData = await response.json();
+                
+                if (userData.error) {
+                    showNotification('Завершите регистрацию в боте через /start', 'warning');
+                    return false;
+                }
+                
+                // Показываем информацию о пользователе
+                document.getElementById('user-info').innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="background: #0088cc; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <strong>${userData.first_name} ${userData.last_name}</strong><br>
+                            <small>📞 ${userData.phone}</small>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('user-info').style.display = 'block';
+                
+                return true;
+            } catch (e) {
+                console.error('Auth error:', e);
+                return false;
+            }
+        }
+
         // Добавление в корзину
         async function addToCart(name, price) {
+            const isAuthenticated = await checkAuth();
+            if (!isAuthenticated) return;
+            
             cart.push({name, price});
             updateCartCount();
             showNotification(`${name} добавлен в корзину!`);
@@ -147,6 +235,9 @@
 
         // Просмотр корзины
         async function viewCart() {
+            const isAuthenticated = await checkAuth();
+            if (!isAuthenticated) return;
+            
             if (cart.length === 0) {
                 showNotification('Корзина пуста!', 'warning');
                 return;
