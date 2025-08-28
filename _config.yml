@@ -1,6 +1,54 @@
-title: Sole Fresh - Химчистка обуви
+# _config.yml - Настройки Jekyll для GitHub Pages
+title: "Sole Fresh - Химчистка обуви"
 description: "Профессиональная химчистка обуви. Расчет стоимости онлайн"
+url: "https://solefreshbot.github.io"
+baseurl: "/SoleFresh"
+
+# Настройки темы
 theme: jekyll-theme-minimal
-plugins: []
-include: [".html", ".css", ".js", ".jpg", ".png", ".svg"]
-exclude: ["README.md"]
+
+# Плагины
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Настройки сборки
+markdown: kramdown
+permalink: pretty
+
+# Включаемые файлы
+include:
+  - ".html"
+  - ".css"
+  - ".js"
+  - ".json"
+  - ".xml"
+  - ".txt"
+  - ".md"
+  - ".svg"
+  - ".png"
+  - ".jpg"
+  - ".jpeg"
+  - ".gif"
+  - ".ico"
+
+# Исключаемые файлы
+exclude:
+  - "README.md"
+  - "LICENSE"
+  - "Gemfile"
+  - "Gemfile.lock"
+  - "node_modules"
+  - "vendor"
+
+# Настройки GitHub Pages
+github:
+  metadata: true
+  source: master
+  build: true
+
+# Дополнительные настройки
+collections:
+  posts:
+    output: true
+    permalink: /blog/:year/:month/:day/:title/
