@@ -3,10 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoleFresh - Каталог услуг</title>
+    <title>Sole Fresh - Расчет стоимости</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #0088cc;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #0088cc;
+            outline: none;
+            box-shadow: 0 0 10px rgba(0,136,204,0.2);
+        }
+        
+        button {
+            background: #0088cc;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #006699;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .price-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #0088cc;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+        }
+        
         .loader {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #3498db;
@@ -18,42 +111,6 @@
             display: none;
         }
         
-        .notification {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            background: #4CAF50;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .notification.error {
-            background: #f44336;
-        }
-        
-        .notification.warning {
-            background: #ff9800;
-        }
-        
-        .notification.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        
-        .notification.hide {
-            transform: translateY(-100px);
-            opacity: 0;
-        }
-        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -62,200 +119,94 @@
 </head>
 <body>
     <div class="container">
-        <h2><i class="fas fa-list-alt"></i> Каталог услуг</h2>
+        <h2><i class="fas fa-calculator"></i> Расчет стоимости чистки</h2>
+        
+        <div class="form-group">
+            <label for="brandInput"><i class="fas fa-tag"></i> Введите бренд обуви:</label>
+            <input type="text" id="brandInput" placeholder="Например: Nike, Gucci, Adidas..." autocomplete="off">
+        </div>
+        
+        <button onclick="calculatePrice()" id="calculateBtn">
+            <i class="fas fa-calculator"></i> РАССЧИТАТЬ СТОИМОСТЬ
+        </button>
+        
+        <div class="price-info">
+            <h3><i class="fas fa-info-circle"></i> Информация о ценах:</h3>
+            <p>• <b>Бюджетные бренды:</b> 2,990 руб.</p>
+            <p>• <b>Премиум бренды:</b> 3,990 руб.</p>
+            <p>• <b>Экспресс-чистка:</b> +50% (готовность за 2 дня)</p>
+        </div>
         
         <div id="loader" class="loader"></div>
-        
-        <div id="services">
-            <div class="service">
-                <h3><i class="fas fa-rocket"></i> Премиум дизайн</h3>
-                <p>Эксклюзивный дизайн для вашего проекта с 3D-визуализацией</p>
-                <button onclick="addToCart('Премиум дизайн', 5000)">
-                    <i class="fas fa-cart-plus"></i> Добавить (5000 руб)
-                </button>
-            </div>
-            
-            <div class="service">
-                <h3><i class="fas fa-chart-line"></i> Продвижение</h3>
-                <p>Комплексное продвижение в социальных сетях</p>
-                <button onclick="addToCart('Продвижение', 3000)">
-                    <i class="fas fa-cart-plus"></i> Добавить (3000 руб)
-                </button>
-            </div>
-            
-            <div class="service">
-                <h3><i class="fas fa-code"></i> Разработка</h3>
-                <p>Создание сайтов и веб-приложений под ключ</p>
-                <button onclick="addToCart('Разработка', 10000)">
-                    <i class="fas fa-cart-plus"></i> Добавить (10000 руб)
-                </button>
-            </div>
-            
-            <div class="service">
-                <h3><i class="fas fa-headset"></i> Консультация</h3>
-                <p>Индивидуальная консультация по digital-стратегии</p>
-                <button onclick="addToCart('Консультация', 2500)">
-                    <i class="fas fa-cart-plus"></i> Добавить (2500 руб)
-                </button>
-            </div>
-        </div>
-        
-        <div id="cart" onclick="viewCart()">
-            <i class="fas fa-shopping-cart"></i>
-            <span id="cart-count">0</span>
-        </div>
     </div>
+    
+    <div id="notification" class="notification"></div>
 
     <script>
-        let cart = [];
-        let user_id = null;
-        const API_BASE_URL = 'http://localhost:8000';
-
-        // Инициализация WebApp
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (window.Telegram && Telegram.WebApp) {
-                Telegram.WebApp.expand();
-                user_id = Telegram.WebApp.initDataUnsafe.user?.id;
-                await loadCart();
-            }
-        });
-
-        // Загрузка корзины из БД
-        async function loadCart() {
-            if (!user_id) return;
+        function calculatePrice() {
+            const brand = document.getElementById('brandInput').value.trim();
             
-            showLoader();
-            
-            try {
-                const response = await fetch(`${API_BASE_URL}/get_cart?user_id=${user_id}`);
-                const data = await response.json();
-                
-                if (data.cart_data) {
-                    cart = JSON.parse(data.cart_data);
-                    updateCartCount();
-                }
-            } catch (e) {
-                console.error("Ошибка загрузки корзины:", e);
-            } finally {
-                hideLoader();
-            }
-        }
-
-        // Сохранение корзины в БД
-        async function saveCart() {
-            if (!user_id) return;
-            
-            showLoader();
-            
-            try {
-                const response = await fetch(`${API_BASE_URL}/save_cart`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        user_id: user_id,
-                        cart_data: JSON.stringify(cart)
-                    })
-                });
-                
-                const result = await response.json();
-                if (result.status !== 'success') {
-                    throw new Error('Ошибка сохранения');
-                }
-                return true;
-            } catch (e) {
-                console.error("Ошибка сохранения корзины:", e);
-                showNotification('Ошибка сохранения корзины', 'error');
-                return false;
-            } finally {
-                hideLoader();
-            }
-        }
-
-        // Добавление в корзину
-        async function addToCart(name, price) {
-            cart.push({name, price});
-            updateCartCount();
-            showNotification(`${name} добавлен в корзину!`);
-            await saveCart();
-        }
-
-        // Просмотр корзины
-        async function viewCart() {
-            if (cart.length === 0) {
-                showNotification('Корзина пуста!', 'warning');
+            if (!brand) {
+                showNotification('Введите бренд обуви', 'error');
                 return;
             }
             
-            let message = "🛒 Ваш заказ:\n\n";
-            let total = 0;
+            // Показываем загрузчик
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('calculateBtn').disabled = true;
             
-            cart.forEach(item => {
-                message += `▪️ ${item.name}: ${item.price} руб\n`;
-                total += item.price;
-            });
-            
-            message += `\n💵 Итого: ${total} руб`;
-            
+            // Отправляем данные в бота
             if (window.Telegram && Telegram.WebApp) {
                 try {
-                    await saveCart();
                     Telegram.WebApp.sendData(JSON.stringify({
-                        action: 'view_cart',
-                        cart: cart,
-                        total: total
+                        action: 'calculate_price',
+                        brand: brand
                     }));
+                    
+                    // Закрываем WebApp после отправки
+                    setTimeout(() => {
+                        Telegram.WebApp.close();
+                    }, 1000);
+                    
                 } catch (e) {
+                    console.error('Ошибка отправки данных:', e);
                     showNotification('Ошибка отправки данных', 'error');
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('calculateBtn').disabled = false;
                 }
             } else {
-                alert(message);
+                // Для тестирования вне Telegram
+                alert(`Бренд: ${brand}\nДля расчета стоимости откройте в Telegram боте`);
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('calculateBtn').disabled = false;
             }
         }
-
-        // Обновление счетчика корзины
-        function updateCartCount() {
-            document.getElementById('cart-count').innerText = cart.length;
-        }
-
-        // Показать уведомление
+        
         function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.innerHTML = `
-                <span>${message}</span>
-                <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'exclamation'}"></i>
-            `;
-            document.body.appendChild(notification);
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.background = type === 'error' ? '#f44336' : '#4CAF50';
+            notification.style.display = 'block';
             
             setTimeout(() => {
-                notification.classList.add('show');
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                    notification.classList.add('hide');
-                    
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 300);
-                }, 2000);
-            }, 100);
+                notification.style.display = 'none';
+            }, 3000);
         }
-
-        // Показать загрузчик
-        function showLoader() {
-            document.getElementById('loader').style.display = 'block';
-        }
-
-        // Скрыть загрузчик
-        function hideLoader() {
-            document.getElementById('loader').style.display = 'none';
-        }
-
-        // Сохраняем корзину при закрытии
-        window.addEventListener('beforeunload', async () => {
-            await saveCart();
+        
+        // Автофокус на поле ввода
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('brandInput').focus();
+            
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.expand();
+            }
+        });
+        
+        // Поиск при нажатии Enter
+        document.getElementById('brandInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculatePrice();
+            }
         });
     </script>
 </body>
