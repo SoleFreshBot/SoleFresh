@@ -241,28 +241,36 @@
             document.getElementById('calculateBtn').disabled = true;
             document.getElementById('calculateBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> РАСЧЕТ...';
             
-            // Отправляем данные в бота
+            // Проверяем, что мы в Telegram WebApp
             if (window.Telegram && Telegram.WebApp) {
                 try {
+                    // Отправляем данные в бота
                     Telegram.WebApp.sendData(JSON.stringify({
                         action: 'calculate_price',
                         brand: brand
                     }));
                     
-                    // Закрываем WebApp через секунду
+                    showNotification('Данные отправлены в бота...', 'success');
+                    
+                    // Закрываем WebApp через 2 секунды
                     setTimeout(() => {
                         Telegram.WebApp.close();
-                    }, 1500);
+                    }, 2000);
                     
                 } catch (e) {
                     console.error('Ошибка отправки данных:', e);
-                    showNotification('Ошибка связи с ботом', 'error');
+                    showNotification('Ошибка отправки данных', 'error');
                     hideLoader();
                 }
             } else {
-                // Для тестирования вне Telegram
-                showNotification('Откройте в Telegram боте для расчета', 'error');
+                // Если не в Telegram, показываем инструкцию
+                showNotification('Откройте этот WebApp через Telegram бота', 'error');
                 hideLoader();
+                
+                // Показываем информацию о бренде для теста
+                setTimeout(() => {
+                    alert(`Бренд: ${brand}\n\nДля расчета стоимости:\n1. Откройте @YourBotName в Telegram\n2. Нажмите "РАССЧИТАТЬ СТОИМОСТЬ"\n3. Введите бренд`);
+                }, 1000);
             }
         }
         
@@ -293,6 +301,9 @@
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.expand();
                 Telegram.WebApp.enableClosingConfirmation();
+                
+                // Показываем информацию, что WebApp работает
+                showNotification('WebApp подключен к Telegram', 'success');
             }
         });
         
