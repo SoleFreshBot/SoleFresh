@@ -1,16 +1,6 @@
-title: SoleFresh Каталог
-description: "Выберите услуги и добавьте в корзину"
-
-# Отключение Jekyll для статического сайта
+title: Sole Fresh - Химчистка обуви
+description: "Профессиональная химчистка обуви. Расчет стоимости онлайн"
+theme: jekyll-theme-minimal
 plugins: []
-theme: none
-markdown: kramdown
-permalink: pretty
-
-# Разрешить обработку всех нужных файлов
-include: [".html", ".css", ".js", ".svg", ".png", ".jpg"]
+include: [".html", ".css", ".js", ".jpg", ".png", ".svg"]
 exclude: ["README.md"]
-
-# Настройки для GitHub Pages
-github:
-  metadata: true
