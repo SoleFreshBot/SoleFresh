@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sole Fresh - Расчет стоимости чистки обуви</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Sole Fresh - Расчет стоимости</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -18,310 +17,182 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         .container {
-            max-width: 500px;
-            margin: 0 auto;
             background: white;
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-        
-        .header {
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-width: 400px;
+            width: 100%;
             text-align: center;
-            margin-bottom: 30px;
         }
         
-        .header h1 {
-            color: #2c3e50;
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-        
-        .header .logo {
-            font-size: 48px;
+        .logo {
+            font-size: 50px;
             color: #667eea;
             margin-bottom: 15px;
         }
         
-        .form-group {
-            margin-bottom: 25px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
+        h1 {
             color: #2c3e50;
-            font-size: 16px;
+            margin-bottom: 10px;
+            font-size: 24px;
         }
         
-        input[type="text"] {
+        .input-group {
+            margin: 25px 0;
+        }
+        
+        input {
             width: 100%;
-            padding: 15px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
             font-size: 16px;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
+            text-align: center;
         }
         
-        input[type="text"]:focus {
-            border-color: #667eea;
+        input:focus {
             outline: none;
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
-            background: white;
+            border-color: #667eea;
         }
         
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 18px 30px;
-            border-radius: 12px;
-            cursor: pointer;
+            padding: 15px;
+            border-radius: 10px;
             font-size: 18px;
             font-weight: bold;
             width: 100%;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
-        }
-        
-        .btn:active {
-            transform: translateY(0);
+            cursor: pointer;
+            margin-top: 10px;
         }
         
         .btn:disabled {
             background: #ccc;
             cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
         }
         
         .price-info {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 25px;
-            border-radius: 15px;
-            margin-top: 30px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .price-info h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-        
-        .price-info p {
-            margin-bottom: 8px;
-            font-size: 15px;
-        }
-        
-        .price-info b {
-            color: #667eea;
-        }
-        
-        .loader {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-            display: none;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 14px;
         }
         
         .notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #4CAF50;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            display: none;
-            z-index: 1000;
-            max-width: 300px;
-        }
-        
-        .notification.error {
             background: #f44336;
-        }
-        
-        .examples {
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
             margin-top: 15px;
-            font-size: 14px;
-            color: #666;
-        }
-        
-        .examples b {
-            color: #667eea;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-                margin: 10px;
-            }
-            
-            .header h1 {
-                font-size: 24px;
-            }
-            
-            .btn {
-                padding: 15px 25px;
-                font-size: 16px;
-            }
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="logo">
-                <i class="fas fa-shoe-prints"></i>
-            </div>
-            <h1>Sole Fresh - Химчистка обуви</h1>
-            <p>Профессиональная чистка любой обуви</p>
+        <div class="logo">
+            <i class="fas fa-shoe-prints"></i>
         </div>
         
-        <div class="form-group">
-            <label for="brandInput">
-                <i class="fas fa-tag"></i> Введите бренд вашей обуви:
-            </label>
-            <input type="text" id="brandInput" placeholder="Например: Nike, Gucci, Adidas..." autocomplete="off">
-            <div class="examples">
-                Примеры: <b>Nike</b>, <b>Adidas</b> - бюджетные; <b>Gucci</b>, <b>Prada</b> - премиум
-            </div>
+        <h1>Расчет стоимости чистки</h1>
+        <p>Введите бренд обуви</p>
+        
+        <div class="input-group">
+            <input type="text" id="brandInput" placeholder="Nike, Adidas, Gucci..." autocomplete="off">
         </div>
         
-        <button class="btn" onclick="calculatePrice()" id="calculateBtn">
-            <i class="fas fa-calculator"></i> РАССЧИТАТЬ СТОИМОСТЬ
+        <button class="btn" onclick="sendData()" id="calculateBtn">
+            <i class="fas fa-calculator"></i> РАССЧИТАТЬ
         </button>
         
         <div class="price-info">
-            <h3><i class="fas fa-info-circle"></i> Информация о ценах:</h3>
-            <p>• <b>Бюджетные бренды:</b> 2,990 руб.</p>
-            <p>• <b>Премиум бренды:</b> 3,990 руб.</p>
-            <p>• <b>Экспресс-чистка:</b> +50% (готовность за 2 дня)</p>
-            <p>• <b>Обычная чистка:</b> 5-7 дней</p>
+            <p><b>Бюджетные бренды:</b> 2,990 руб.</p>
+            <p><b>Премиум бренды:</b> 3,990 руб.</p>
+            <p><b>Экспресс:</b> +50% (2 дня)</p>
         </div>
         
-        <div id="loader" class="loader"></div>
+        <div id="notification" class="notification">
+            Откройте в Telegram боте!
+        </div>
     </div>
-    
-    <div id="notification" class="notification"></div>
 
     <script>
-        function calculatePrice() {
+        // Проверяем, запущен ли в Telegram WebApp
+        function isTelegramWebApp() {
+            return window.Telegram && Telegram.WebApp && Telegram.WebApp.initData;
+        }
+        
+        // Показываем уведомление
+        function showNotification() {
+            document.getElementById('notification').style.display = 'block';
+        }
+        
+        // Скрываем уведомление
+        function hideNotification() {
+            document.getElementById('notification').style.display = 'none';
+        }
+        
+        // Отправляем данные
+        function sendData() {
             const brand = document.getElementById('brandInput').value.trim();
             
             if (!brand) {
-                showNotification('Пожалуйста, введите бренд обуви', 'error');
+                alert('Введите бренд обуви');
                 return;
             }
             
-            // Показываем загрузчик
-            document.getElementById('loader').style.display = 'block';
-            document.getElementById('calculateBtn').disabled = true;
-            document.getElementById('calculateBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> РАСЧЕТ...';
-            
-            // Проверяем, что мы в Telegram WebApp
-            if (window.Telegram && Telegram.WebApp) {
+            if (isTelegramWebApp()) {
+                // Если в Telegram - отправляем данные
                 try {
-                    // Отправляем данные в бота
                     Telegram.WebApp.sendData(JSON.stringify({
                         action: 'calculate_price',
                         brand: brand
                     }));
                     
-                    showNotification('Данные отправлены в бота...', 'success');
-                    
-                    // Закрываем WebApp через 2 секунды
+                    // Закрываем WebApp
                     setTimeout(() => {
                         Telegram.WebApp.close();
-                    }, 2000);
+                    }, 1000);
                     
-                } catch (e) {
-                    console.error('Ошибка отправки данных:', e);
-                    showNotification('Ошибка отправки данных', 'error');
-                    hideLoader();
+                } catch (error) {
+                    alert('Ошибка отправки: ' + error);
                 }
             } else {
-                // Если не в Telegram, показываем инструкцию
-                showNotification('Откройте этот WebApp через Telegram бота', 'error');
-                hideLoader();
-                
-                // Показываем информацию о бренде для теста
-                setTimeout(() => {
-                    alert(`Бренд: ${brand}\n\nДля расчета стоимости:\n1. Откройте @YourBotName в Telegram\n2. Нажмите "РАССЧИТАТЬ СТОИМОСТЬ"\n3. Введите бренд`);
-                }, 1000);
+                // Если не в Telegram - показываем уведомление
+                showNotification();
             }
         }
         
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            notification.innerHTML = `
-                <i class="fas ${type === 'error' ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
-                ${message}
-            `;
-            notification.className = `notification ${type}`;
-            notification.style.display = 'block';
+        // При загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isTelegramWebApp()) {
+                // В Telegram - расширяем на весь экран
+                Telegram.WebApp.expand();
+                hideNotification();
+            } else {
+                // Не в Telegram - показываем уведомление
+                showNotification();
+            }
             
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 4000);
-        }
-        
-        function hideLoader() {
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('calculateBtn').disabled = false;
-            document.getElementById('calculateBtn').innerHTML = '<i class="fas fa-calculator"></i> РАССЧИТАТЬ СТОИМОСТЬ';
-        }
-        
-        // Автофокус на поле ввода
-        document.addEventListener('DOMContentLoaded', () => {
+            // Фокус на поле ввода
             document.getElementById('brandInput').focus();
             
-            if (window.Telegram && Telegram.WebApp) {
-                Telegram.WebApp.expand();
-                Telegram.WebApp.enableClosingConfirmation();
-                
-                // Показываем информацию, что WebApp работает
-                showNotification('WebApp подключен к Telegram', 'success');
-            }
-        });
-        
-        // Поиск при нажатии Enter
-        document.getElementById('brandInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                calculatePrice();
-            }
-        });
-        
-        // Плавное появление
-        document.addEventListener('DOMContentLoaded', () => {
-            document.body.style.opacity = '0';
-            document.body.style.transition = 'opacity 0.5s ease';
-            
-            setTimeout(() => {
-                document.body.style.opacity = '1';
-            }, 100);
+            // Enter для отправки
+            document.getElementById('brandInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendData();
+                }
+            });
         });
     </script>
 </body>
